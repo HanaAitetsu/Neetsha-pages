@@ -46,7 +46,7 @@ function toggleMode() {
 
 // 入力操作
 viewer.addEventListener("click", e =>
-  e.clientX > window.innerWidth / 2 ? next() : prev()
+  e.clientX < window.innerWidth / 2 ? next() : prev()
 );
 
 document.addEventListener("keydown", e => {
@@ -60,7 +60,9 @@ viewer.addEventListener("touchstart", e => {
 });
 viewer.addEventListener("touchend", e => {
   const diff = startX - e.changedTouches[0].clientX;
-  if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
+  // touchend
+if (diff < -50) next();   // 右スワイプ → 次
+if (diff > 50) prev();    // 左スワイプ → 前
 });
 
 // 初期表示
