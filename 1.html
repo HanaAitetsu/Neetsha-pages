@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="index.css">
+  <title>第一話</title>
+</head>
+
+<body>
+
+<div id="main">
+
+  <div id="toolbar">
+    <button onclick="toggleMode()">縦/横 切替</button>
+    <span id="pageNum"></span>
+  </div>
+
+  <div id="viewer" class="horizontal">
+    <img id="page">
+  </div>
+
+</div>
+
+<!-- 話ごとの設定 -->
+<script>
+  pages = ["images/1-1.gif", "images/1-2.gif"];
+  prevEpisode = "index.html";
+  nextEpisode = "2.html";
+  isLastEpisode = false;
+</script>
+
+<script src="viewer.js"></script>
+
+</body>
+</html>
