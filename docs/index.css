@@ -48,7 +48,10 @@ a:active {
 /* 画像は基本はみ出さない */
 #main img {
 	max-width: 100%;
-	height: auto;
+}
+
+#table.magazine {
+	margin: 0 auto;
 }
 
 /* ===== ビューア関連（重要） ===== */
