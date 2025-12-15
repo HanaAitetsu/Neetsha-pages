@@ -1,0 +1,113 @@
+body {
+	margin: 0;
+	background-color: #fff;
+	font-size: 16px;
+	text-align: center;
+}
+
+h1 {
+	font-size: 24px;
+	line-height: 30px;
+	margin: 0;
+	padding: 3px;
+}
+
+a {
+	color: #000000;
+}
+
+a:visited {
+	color: #595E3C;
+}
+
+a:hover {
+	color: #404040;
+}
+
+a:active {
+	color: #FF0000;
+}
+
+#main {
+	background-color: #eee;
+	text-align: center;
+	line-height: 120%;
+	border: 2px solid #222;
+	margin: 10px;
+	padding: 4px;
+	border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+}
+
+#main img {
+	max-width: 100%;
+}
+
+table.magazine {
+	margin: 0 auto;
+}
+
+#comment {
+	background-color: #eee;
+	text-align: center;
+	border: 2px solid #222;
+	margin:  10px;
+	padding: 4px;
+	border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+}
+
+#comment form.post textarea{
+	width: 80%;
+}
+
+.center {
+	text-align: center;
+}
+
+td{
+	margin: 0;
+}
+
+#form{
+	width: 100%;
+}
+
+.post {
+	font-size: 18px;
+	text-decoration: none;
+}
+
+#bgi {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	text-align: center;
+	overflow: hidden;
+}
+
+#bgi img{
+	width: 100%;
+	max-width: 600px; /* 最大幅 */
+}
+
+hr {
+	border: 0px;
+	border-bottom: dotted 2px gray;
+	margin: 1em;
+}
+
+.pager {
+	margin: 2em;
+}
+
+.pager a {
+	border: solid 2px gray;
+	background-color: #eeeeee;
+	padding: 0.5em 1em;
+	border-radius: 3px;
+	text-decoration: none;
+	margin: 0.5em;
+}
