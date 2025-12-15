@@ -1,36 +1,87 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!--新都社自サイト連載用雛形 ver9.90　※それ以外の用途で利用しないでください。(c) 2005〜 Neetsha -->
 <head>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="index.css">
-  <title>新都社作品タイトル</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<link rel="stylesheet" href="index.css" type="text/css" />
+	<title>新都社作品タイトル</title>
 </head>
 
 <body>
 
 <div id="main">
-  <h1>作品タイトル</h1>
+	<table class="magazine">
+		<tr>
+			<td rowspan="2">
+				<a href="https://neetsha.jp/inside/main.php?t=0&magazine=1" target="_self">
+					<img src="neetel_inside.gif" border="0" alt="新都社" /></a>
+			</td>
+			<td>
+				<a href="https://neetsha.jp/inside/main.php?t=0&magazine=1" target="_self">週刊少年VIP</a>
+			</td>
+		</tr>
+	</table>
 
-  <div id="bgi">
-    <img src="top.gif">
-  </div>
+	<hr>
 
-  <hr>
+	<h1>作品タイトル</h1>
 
-  <p>
-    <a href="1.html">▶ 第一話（横読み）</a><br>
-    <a href="1.html#vertical">▶ 第一話（縦読み版はこちら）</a>
-  </p>
+	<hr>
 
-  <p>
-    <a href="2.html">▶ 第二話（最終話）</a><br>
-    <a href="2.html#vertical">▶ 第二話 縦読み版</a>
-  </p>
+	<div id="bgi">
+		<img src="top.gif">
+	</div>
 
-  <hr>
-  <p>作者コメント：○○○○○</p>
+	<hr>
+
+	<p>
+		&nbsp;<a href="1.html" target="_self">第一話</a>
+	</p>
+
+	<hr>
+
+	<p>作者コメント：○○○○○</p>
 </div>
+
+<div id="comment">
+
+	<p>
+		<a href="https://何かリンクご自由にどうぞ" target="_blank">新作者</a>先生に励ましのお便りを送ろう！！
+	</p>
+
+	<!-- Neetel_Inside_Comment -->
+	<script type="text/javascript">
+        <!--
+        var comicid = xxxxx;
+        -->
+	</script>
+	<script type="text/javascript" charset="utf-8" src="https://neetsha.jp/addon/add_menu.js"></script>
+	<form action="https://neetsha.jp/inside/comment.php" method="post" class="post" utn>
+		<input type="hidden" name="methodid" value="1" />
+		<input type="hidden" name="id" value="xxxxx" />
+		<input type="hidden" name="enc" value="0" />
+		<textarea style="width:80%; height:4em;" maxlength="256" name="comment" placeholder="ここに感想を書いてください。"></textarea>
+		<p>
+			<label>
+				<input type="checkbox" name="sage" value="1" />sage
+			</label>
+			<input type="submit" name="submit" value="感想を書く" />
+		</p>
+	</form>
+	<!-- Neetel_Inside_Comment -->
+
+	<p>
+		<a href="https://neetsha.jp/inside/comment.php?id=xxxxx">〒みんなの感想を読む</a>
+	</p>
+</div>
+
+<p>
+	<a href="https://neetsha.jp/" target="_top">
+		<img src="https://neetsha.jp/image/banner.gif" border="0" alt="Neetsha" />
+	</a>
+</p>
 
 </body>
 </html>
