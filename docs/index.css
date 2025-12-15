@@ -28,7 +28,7 @@ a:active {
 	color: #FF0000;
 }
 
-/* ===== メイン枠 ===== */
+/* メイン枠 */
 #main {
 	background-color: #eee;
 	text-align: center;
@@ -37,50 +37,74 @@ a:active {
 	margin: 10px;
 	padding: 4px;
 	border-radius: 8px;
-	min-height: 100dvh;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
 
-	/* ★ 追加：中身を縦に並べる */
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+	/* 追加：中身が増えても潰れない */
+	display: block;
 }
 
-/* 画像は基本はみ出さない */
+/* 画像全般 */
 #main img {
 	max-width: 100%;
+	height: auto;
 }
 
-#table.magazine {
-	margin: 0 auto;
-}
+/* ===== 漫画ビューア用（追加） ===== */
 
-/* ===== ビューア関連（重要） ===== */
 #viewer {
+	position: relative;
 	width: 100%;
-	flex: 1;                 /* ★ タイトル等の残り領域を使う */
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	margin: 0 auto;
 	overflow: hidden;
 }
 
-#viewer img {
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: contain;
+/* 横読み時 */
+#viewer.horizontal {
+	cursor: pointer;
 }
 
-/* ===== 縦読みモード用 ===== */
+/* 縦読み時 */
 #viewer.vertical {
+	display: flex;
 	flex-direction: column;
-	overflow-y: auto;
+	gap: 10px;
 }
 
+/* 横読み用 img */
+#viewer.horizontal img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+}
+
+/* 縦読み用 img */
 #viewer.vertical img {
-	margin-bottom: 1em;
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
 }
 
-/* ===== コメント欄 ===== */
+/* ツールバー */
+#toolbar {
+	margin: 0.5em 0;
+	display: flex;
+	justify-content: center;
+	gap: 1em;
+	align-items: center;
+}
+
+/* ページ番号 */
+#pageNum {
+	font-size: 14px;
+}
+
+/* ===== ここまで追加 ===== */
+
+table.magazine {
+	margin: 0 auto;
+}
+
 #comment {
 	background-color: #eee;
 	text-align: center;
@@ -88,6 +112,8 @@ a:active {
 	margin: 10px;
 	padding: 4px;
 	border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
 }
 
 #comment form.post textarea {
@@ -111,7 +137,6 @@ td {
 	text-decoration: none;
 }
 
-/* ===== 背景画像・ヘッダー系 ===== */
 #bgi {
 	margin: 0;
 	padding: 0;
@@ -125,9 +150,8 @@ td {
 	max-width: 600px;
 }
 
-/* ===== 装飾 ===== */
 hr {
-	border: 0;
+	border: 0px;
 	border-bottom: dotted 2px gray;
 	margin: 1em;
 }
