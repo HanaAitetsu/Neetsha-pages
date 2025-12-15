@@ -38,6 +38,7 @@ a:active {
 	border-radius: 8px;
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
+	min-height: 100dvh;
 }
 
 #main img {
@@ -45,7 +46,7 @@ a:active {
 }
 
 table.magazine {
-	margin: 0 auto;
+	height: auto;
 }
 
 #comment {
