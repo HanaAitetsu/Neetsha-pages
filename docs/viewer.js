@@ -46,7 +46,8 @@ function toggleMode() {
 
 // 入力操作
 viewer.addEventListener("click", e =>
-  e.clientX < window.innerWidth / 2 ? next() : prev()
+ if (e.clientX < window.innerWidth / 2) next();
+else prev();
 );
 
 document.addEventListener("keydown", e => {
