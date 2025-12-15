@@ -1,7 +1,3 @@
-let pages = [];
-let prevEpisode = "";
-let nextEpisode = "";
-
 let index = 0;
 let mode = "horizontal";
 
