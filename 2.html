@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="index.css">
+  <title>最終話</title>
+</head>
+
+<body>
+
+<div id="main">
+
+  <div id="toolbar">
+    <button onclick="toggleMode()">縦/横 切替</button>
+    <span id="pageNum"></span>
+  </div>
+
+  <div id="viewer" class="horizontal">
+    <img id="page">
+  </div>
+
+</div>
+
+<script>
+  pages = ["images/2-1.gif", "images/2-2.gif"];
+  prevEpisode = "1.html";
+  nextEpisode = "index.html";   // ← 最終話なのでトップへ
+  isLastEpisode = true;
+</script>
+
+<script src="viewer.js"></script>
+
+</body>
+</html>
