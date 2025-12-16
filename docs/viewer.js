@@ -62,8 +62,8 @@ viewer.addEventListener("touchstart", e => {
 viewer.addEventListener("touchend", e => {
   const diff = startX - e.changedTouches[0].clientX;
   // touchend
-if (diff < -50) next();   // 右スワイプ → 次
-if (diff > 50) prev();    // 左スワイプ → 前
+if (diff < -50) prev();   // 右スワイプ → front
+if (diff > 50) next();    // 左スワイプ → next
 });
 
 // 初期表示
