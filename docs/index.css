@@ -28,6 +28,7 @@ a:active {
 	color: #FF0000;
 }
 
+/* メイン枠 */
 #main {
 	background-color: #eee;
 	text-align: center;
@@ -38,11 +39,67 @@ a:active {
 	border-radius: 8px;
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
+
+	/* 追加：中身が増えても潰れない */
+	display: block;
 }
 
+/* 画像全般 */
 #main img {
 	max-width: 100%;
+	height: auto;
 }
+
+/* ===== 漫画ビューア用（追加） ===== */
+
+#viewer {
+	position: relative;
+	width: 100%;
+	margin: 0 auto;
+	overflow: hidden;
+}
+
+/* 横読み時 */
+#viewer.horizontal {
+	cursor: pointer;
+}
+
+/* 縦読み時 */
+#viewer.vertical {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+/* 横読み用 img */
+#viewer.horizontal img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+}
+
+/* 縦読み用 img */
+#viewer.vertical img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+}
+
+/* ツールバー */
+#toolbar {
+	margin: 0.5em 0;
+	display: flex;
+	justify-content: center;
+	gap: 1em;
+	align-items: center;
+}
+
+/* ページ番号 */
+#pageNum {
+	font-size: 14px;
+}
+
+/* ===== ここまで追加 ===== */
 
 table.magazine {
 	margin: 0 auto;
@@ -52,14 +109,14 @@ table.magazine {
 	background-color: #eee;
 	text-align: center;
 	border: 2px solid #222;
-	margin:  10px;
+	margin: 10px;
 	padding: 4px;
 	border-radius: 8px;
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
 }
 
-#comment form.post textarea{
+#comment form.post textarea {
 	width: 80%;
 }
 
@@ -67,11 +124,11 @@ table.magazine {
 	text-align: center;
 }
 
-td{
+td {
 	margin: 0;
 }
 
-#form{
+#form {
 	width: 100%;
 }
 
@@ -88,9 +145,9 @@ td{
 	overflow: hidden;
 }
 
-#bgi img{
+#bgi img {
 	width: 100%;
-	max-width: 600px; /* 最大幅 */
+	max-width: 600px;
 }
 
 hr {
