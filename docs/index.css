@@ -50,6 +50,10 @@ a:active {
 	height: auto;
 }
 
+#title {
+  text-align: center;
+}
+
 /* ===== 漫画ビューア用（追加） ===== */
 
 #viewer {
