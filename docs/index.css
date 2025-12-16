@@ -168,3 +168,37 @@ hr {
 	text-decoration: none;
 	margin: 0.5em;
 }
+
+/* ===== viewer 安定化（超重要） ===== */
+
+#viewer {
+	width: 100%;
+	margin: 0 auto;
+	overflow: hidden;
+
+	/* これが無いと画像が出ないことがある */
+	min-height: 50vh;
+}
+
+/* 横読み時の画像 */
+#viewer.horizontal img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+	height: auto;
+}
+
+/* 縦読み時 */
+#viewer.vertical {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+#viewer.vertical img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+	height: auto;
+}
+
