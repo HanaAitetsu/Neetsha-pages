@@ -1,74 +1,76 @@
-let index = 0;
-let mode = "horizontal";
+document.addEventListener("DOMContentLoaded", () => {
 
-const viewer = document.getElementById("viewer");
-const img = document.getElementById("page");
-const pageNum = document.getElementById("pageNum");
+  let index = 0;
+  let mode = "horizontal";
 
-function update() {
-  img.src = pages[index];
-  pageNum.textContent = `${index + 1} / ${pages.length}`;
-}
+  const viewer = document.getElementById("viewer");
+  const img = document.getElementById("page");
+  const pageNum = document.getElementById("pageNum");
 
-function next() {
-  if (index < pages.length - 1) index++;
-  else location.href = nextEpisode;
-  update();
-}
+  if (!viewer || !img) {
+    console.error("viewer or img not found");
+    return;
+  }
 
-function prev() {
-  if (index > 0) index--;
-  else location.href = prevEpisode;
-  update();
-}
+  function update() {
+    img.src = pages[index];
+    pageNum.textContent = `${index + 1} / ${pages.length}`;
+  }
 
-function toVertical() {
-  mode = "vertical";
-  viewer.innerHTML = "";
-  pages.forEach(p => {
-    const i = document.createElement("img");
-    i.src = p;
-    viewer.appendChild(i);
+  function next() {
+    if (index < pages.length - 1) index++;
+    else location.href = nextEpisode;
+    update();
+  }
+
+  function prev() {
+    if (index > 0) index--;
+    else location.href = prevEpisode;
+    update();
+  }
+
+  window.toggleMode = function () {
+    if (mode === "horizontal") {
+      mode = "vertical";
+      viewer.className = "vertical";
+      viewer.innerHTML = "";
+      pages.forEach(p => {
+        const i = document.createElement("img");
+        i.src = p;
+        viewer.appendChild(i);
+      });
+      pageNum.textContent = "縦読み";
+    } else {
+      mode = "horizontal";
+      viewer.className = "horizontal";
+      viewer.innerHTML = "";
+      viewer.appendChild(img);
+      update();
+    }
+  };
+
+  // 右読み操作
+  viewer.addEventListener("click", e => {
+    if (e.clientX < window.innerWidth / 2) next();
+    else prev();
   });
-  pageNum.textContent = "縦読み";
-}
 
-function toHorizontal() {
-  mode = "horizontal";
-  viewer.innerHTML = "";
-  viewer.appendChild(img);
+  let startX = 0;
+  viewer.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+  });
+
+  viewer.addEventListener("touchend", e => {
+    const diff = e.changedTouches[0].clientX - startX;
+    if (diff < -50) prev();
+    if (diff > 50) next();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") next();
+    if (e.key === "ArrowRight") prev();
+  });
+
+  // 初期表示
   update();
-}
-
-function toggleMode() {
-  mode === "horizontal" ? toVertical() : toHorizontal();
-}
-
-// 入力操作
-viewer.addEventListener("click", e =>
- if (e.clientX < window.innerWidth / 2) next();
-else prev();
-);
-
-document.addEventListener("keydown", e => {
-  if (e.key === "ArrowRight") next();
-  if (e.key === "ArrowLeft") prev();
 });
-
-let startX = 0;
-viewer.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-viewer.addEventListener("touchend", e => {
-  const diff = startX - e.changedTouches[0].clientX;
-  // touchend
-if (diff < -50) prev();   // 右スワイプ → front
-if (diff > 50) next();    // 左スワイプ → next
-});
-
-// 初期表示
-if (location.hash === "#vertical") {
-  toVertical();
-} else {
-  toHorizontal();
-}
