@@ -52,15 +52,15 @@ document.addEventListener("DOMContentLoaded", () => {
       i.src = p;
       viewer.appendChild(i);
     });
-    pageNum.textContent = "縦読み";
-    showToast("縦読みモード");
+    pageNum.textContent = "タテ読み";
+    showToast("タテ読み");
   } else {
     mode = "horizontal";
     viewer.className = "horizontal";
     viewer.innerHTML = "";
     viewer.appendChild(img);
     update();
-    showToast("横読みモード");
+    showToast("ヨコ読み");
   }
 };
 
@@ -112,7 +112,7 @@ function showToast(msg) {
 }
 
 // 初期トースト
-showToast("📖 横読みモード");
+showToast("ヨコ読み");
   
   // 初期表示
   update();
