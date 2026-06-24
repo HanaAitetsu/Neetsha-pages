@@ -13,9 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function update() {
-    img.src = pages[index];
-    pageNum.textContent = `${index + 1} / ${pages.length}`;
-  }
+  img.src = pages[index];
+  pageNum.textContent = `${index + 1} / ${pages.length}`;
+
+  // サムネイルのアクティブ状態
+  document.querySelectorAll("#thumbnail-strip img").forEach((t, i) => {
+    t.classList.toggle("active", i === index);
+  });
+  const at = document.querySelectorAll("#thumbnail-strip img")[index];
+  if (at) at.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+
+  // ボタンの有効/無効
+  document.getElementById("btn-first").disabled = index === 0;
+  document.getElementById("btn-prev").disabled  = index === 0;
+  document.getElementById("btn-next").disabled  = index === pages.length - 1;
+  document.getElementById("btn-last").disabled  = index === pages.length - 1;
+}
 
   function next() {
     if (index < pages.length - 1) index++;
@@ -30,24 +43,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   window.toggleMode = function () {
-    if (mode === "horizontal") {
-      mode = "vertical";
-      viewer.className = "vertical";
-      viewer.innerHTML = "";
-      pages.forEach(p => {
-        const i = document.createElement("img");
-        i.src = p;
-        viewer.appendChild(i);
-      });
-      pageNum.textContent = "縦読み";
-    } else {
-      mode = "horizontal";
-      viewer.className = "horizontal";
-      viewer.innerHTML = "";
-      viewer.appendChild(img);
-      update();
-    }
-  };
+  if (mode === "horizontal") {
+    mode = "vertical";
+    viewer.className = "vertical";
+    viewer.innerHTML = "";
+    pages.forEach(p => {
+      const i = document.createElement("img");
+      i.src = p;
+      viewer.appendChild(i);
+    });
+    pageNum.textContent = "縦読み";
+    showToast("縦読みモード");
+  } else {
+    mode = "horizontal";
+    viewer.className = "horizontal";
+    viewer.innerHTML = "";
+    viewer.appendChild(img);
+    update();
+    showToast("横読みモード");
+  }
+};
 
   // 右読み操作
   viewer.addEventListener("click", e => {
@@ -71,6 +86,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "ArrowRight") prev();
   });
 
+  // サムネイル生成
+const strip = document.getElementById("thumbnail-strip");
+pages.forEach((src, i) => {
+  const t = document.createElement("img");
+  t.src = src;
+  t.title = (i + 1) + "ページ";
+  t.addEventListener("click", () => { index = i; update(); });
+  strip.appendChild(t);
+});
+
+// ボタン
+document.getElementById("btn-first").addEventListener("click", () => { index = 0; update(); });
+document.getElementById("btn-prev").addEventListener("click",  () => { if (index > 0) { index--; update(); } else location.href = prevEpisode; });
+document.getElementById("btn-next").addEventListener("click",  () => { if (index < pages.length - 1) { index++; update(); } else location.href = nextEpisode; });
+document.getElementById("btn-last").addEventListener("click",  () => { index = pages.length - 1; update(); });
+
+// トースト関数
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+// 初期トースト
+showToast("📖 横読みモード");
+  
   // 初期表示
   update();
 });
