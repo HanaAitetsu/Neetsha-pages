@@ -50,56 +50,115 @@ a:active {
 	height: auto;
 }
 
-/* ===== 漫画ビューア用（追加） ===== */
-
+/* ===== 漫画ビューア用 ===== */
 #viewer {
-	position: relative;
-	width: 100%;
-	margin: 0 auto;
-	overflow: hidden;
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  min-height: 50vh;
+  background: #222;
+  text-align: center;
 }
-
-/* 横読み時 */
 #viewer.horizontal {
-	cursor: pointer;
+  cursor: pointer;
 }
-
-/* 縦読み時 */
-#viewer.vertical {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
-/* 横読み用 img */
 #viewer.horizontal img {
-	display: block;
-	margin: 0 auto;
-	max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
 }
-
-/* 縦読み用 img */
+#viewer.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: default;
+}
 #viewer.vertical img {
-	display: block;
-	margin: 0 auto;
-	max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
 }
-
 /* ツールバー */
 #toolbar {
-	margin: 0.5em 0;
-	display: flex;
-	justify-content: center;
-	gap: 1em;
-	align-items: center;
+  margin: 0.5em 0;
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  align-items: center;
 }
-
+/* 操作ボタン帯 */
+#viewer-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  background: #333;
+}
+#viewer-controls button {
+  background: #555;
+  color: #fff;
+  border: none;
+  padding: 5px 14px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 13px;
+}
+#viewer-controls button:hover { background: #777; }
+#viewer-controls button:disabled { background: #3a3a3a; color: #666; cursor: default; }
 /* ページ番号 */
 #pageNum {
-	font-size: 14px;
+  color: #ccc;
+  min-width: 60px;
+  text-align: center;
+  font-size: 13px;
 }
-
-/* ===== ここまで追加 ===== */
+/* サムネイル帯 */
+#thumbnail-strip {
+  display: flex;
+  overflow-x: auto;
+  gap: 3px;
+  padding: 5px;
+  background: #222;
+  scrollbar-width: thin;
+}
+#thumbnail-strip img {
+  height: 56px;
+  width: auto;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.5;
+  transition: opacity .15s, border-color .15s;
+  flex-shrink: 0;
+}
+#thumbnail-strip img.active {
+  border-color: #e00;
+  opacity: 1;
+}
+#thumbnail-strip img:hover { opacity: 0.85; }
+/* トースト通知 */
+#toast {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 999;
+}
+#toast.show {
+  opacity: 1;
+}
+/* ===== ここまで ===== */
 
 table.magazine {
 	margin: 0 auto;
@@ -168,37 +227,3 @@ hr {
 	text-decoration: none;
 	margin: 0.5em;
 }
-
-/* ===== viewer 安定化（超重要） ===== */
-
-#viewer {
-	width: 100%;
-	margin: 0 auto;
-	overflow: hidden;
-
-	/* これが無いと画像が出ないことがある */
-	min-height: 50vh;
-}
-
-/* 横読み時の画像 */
-#viewer.horizontal img {
-	display: block;
-	margin: 0 auto;
-	max-width: 100%;
-	height: auto;
-}
-
-/* 縦読み時 */
-#viewer.vertical {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
-#viewer.vertical img {
-	display: block;
-	margin: 0 auto;
-	max-width: 100%;
-	height: auto;
-}
-
