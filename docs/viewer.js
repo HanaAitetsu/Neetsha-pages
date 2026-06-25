@@ -66,9 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 右読み操作
   viewer.addEventListener("click", e => {
-    if (e.clientX < window.innerWidth / 2) next();
-    else prev();
-  });
+  if (e.clientX < window.innerWidth / 2) prev();
+  else next();
+});
 
   let startX = 0;
   viewer.addEventListener("touchstart", e => {
@@ -77,8 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   viewer.addEventListener("touchend", e => {
     const diff = e.changedTouches[0].clientX - startX;
-    if (diff < -50) prev();
-    if (diff > 50) next();
+    if (diff < -50) next();
+if (diff > 50) prev();
   });
 
   document.addEventListener("keydown", e => {
