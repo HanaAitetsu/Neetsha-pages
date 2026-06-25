@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="index.css">
-  <title>第2話</title>
+  <title>第二話</title>
 </head>
 
 <body>
@@ -18,7 +18,7 @@
 	<a href="1.html">
 		&lt;&lt; 前
 	</a>
-	<a href="index.html">
+	<a href="2.html">
 		次 &gt;&gt;
 	</a>
 </p>
@@ -30,21 +30,34 @@
   <h1>タイトル</h1>
   <hr>
  </header>
+
+<!-- トースト通知 -->
+<div id="toast"></div>
 	
  <div id="toolbar">
     <button onclick="toggleMode()">縦/横 切替</button>
-    <span id="pageNum"></span>
  </div>
 
   <div id="viewer" class="horizontal">
     <img id="page">
   </div>
 
+	<!-- ページ操作ボタン -->
+<div id="viewer-controls">
+  <button id="btn-first">|◀</button>
+  <button id="btn-prev">◀ 前</button>
+  <span id="pageNum"></span>
+  <button id="btn-next">次 ▶</button>
+  <button id="btn-last">▶|</button>
+</div>
+<!-- サムネイル帯 -->
+<div id="thumbnail-strip"></div>
+
 </div>
 
 <!-- ★ここ重要：先に設定を書く -->
 <script>
-  pages = ["images/2-1.gif", "images/1-2.gif"];
+  pages = ["images/2-1.gif"];
   prevEpisode = "1.html";
   nextEpisode = "index.html";
 </script>
@@ -86,7 +99,7 @@
 	<a href="1.html">
 		&lt;&lt; 前
 	</a>
-	<a href="index.html">
+	<a href="2.html">
 		次 &gt;&gt;
 	</a>
 </p>
