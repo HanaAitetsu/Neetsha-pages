@@ -98,10 +98,16 @@ pages.forEach((src, i) => {
 });
 
 // ボタン
-document.getElementById("btn-first").addEventListener("click", () => { index = 0; update(); });
-document.getElementById("btn-prev").addEventListener("click",  () => { if (index > 0) { index--; update(); } else location.href = prevEpisode; });
-document.getElementById("btn-next").addEventListener("click",  () => { if (index < pages.length - 1) { index++; update(); } else location.href = nextEpisode; });
-document.getElementById("btn-last").addEventListener("click",  () => { index = pages.length - 1; update(); });
+
+document.getElementById("btn-prev").addEventListener("click", () => {
+  if (index < pages.length - 1) { index++; update(); } else location.href = nextEpisode;
+});
+document.getElementById("btn-next").addEventListener("click", () => {
+  if (index > 0) { index--; update(); } else location.href = prevEpisode;
+});
+document.getElementById("btn-first").addEventListener("click", () => { index = pages.length - 1; update(); });
+document.getElementById("btn-last").addEventListener("click",  () => { index = 0; update(); });
+});
 
 // トースト関数
 function showToast(msg) {
