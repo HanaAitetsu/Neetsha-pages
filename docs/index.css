@@ -82,12 +82,25 @@ a:active {
   height: auto;
 }
 /* ツールバー */
+/* 変更後 */
 #toolbar {
   margin: 0.5em 0;
   display: flex;
   justify-content: center;
   gap: 1em;
   align-items: center;
+}
+#toolbar button {
+  font-size: 15px;
+  padding: 8px 20px;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#toolbar button:hover {
+  background: #666;
 }
 /* 操作ボタン帯 */
 #viewer-controls {
