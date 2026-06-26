@@ -98,6 +98,7 @@ a:active {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-family: serif;
 }
 #toolbar button:hover {
   background: #666;
@@ -119,6 +120,7 @@ a:active {
   cursor: pointer;
   border-radius: 3px;
   font-size: 13px;
+  font-family: serif;
 }
 #viewer-controls button:hover { background: #777; }
 #viewer-controls button:disabled { background: #3a3a3a; color: #666; cursor: default; }
