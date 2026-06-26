@@ -36,17 +36,23 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-last").disabled  = index === 0;
   }
 
-  function next() {
-    if (index < pages.length - 1) index++;
-    else location.href = nextEpisode;
+function next() {
+  if (index < pages.length - 1) {
+    index++;
     update();
+  } else {
+    if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
   }
+}
 
-  function prev() {
-    if (index > 0) index--;
-    else location.href = prevEpisode;
+function prev() {
+  if (index > 0) {
+    index--;
     update();
+  } else {
+    if (confirm("前の話に行っていい？")) location.href = prevEpisode;
   }
+}
 
   window.toggleMode = function () {
     if (mode === "horizontal") {
