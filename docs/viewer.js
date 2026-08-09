@@ -5,46 +5,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const pageNum = document.getElementById("pageNum");
   const toast = document.getElementById("toast");
 
-  // スワイプ・アニメーション用変数
   let startX = 0;
   let currentTranslate = 0;
   let prevTranslate = 0;
   let isDragging = false;
-  let animationID = 0;
   let slider = null;
 
   if (!viewer) return;
 
-  // 初期化：スライダー（画像が横に並ぶ土台）を作成
+  // 初期化：スライダー構造の構築
   function initSlider() {
-    viewer.innerHTML = ""; // 一旦空にする
+    viewer.innerHTML = "";
+    viewer.style.display = "block"; // 縦読みから戻った時用
+    viewer.style.overflow = "hidden";
+    viewer.style.position = "relative";
+
     slider = document.createElement("div");
     slider.style.display = "flex";
-    slider.style.flexDirection = "row-reverse"; // 右読み用（1ページ目が右）
-    slider.style.width = `${pages.length * 100}%`;
+    slider.style.flexDirection = "row-reverse"; // 右から左へ並べる（右読み）
     slider.style.height = "100%";
+    slider.style.width = "100%"; 
     slider.style.transition = "transform 0.3s ease-out";
 
-    pages.forEach((src, i) => {
-      const container = document.createElement("div");
-      container.style.width = "100%";
-      container.style.flexShrink = "0";
-      container.style.display = "flex";
-      container.style.justifyContent = "center";
-      container.style.alignItems = "flex-start";
+    pages.forEach((src) => {
+      const pageWrapper = document.createElement("div");
+      pageWrapper.style.flex = "0 0 100%"; // 1枚を必ずviewerと同じ幅にする
+      pageWrapper.style.width = "100%";
+      pageWrapper.style.display = "flex";
+      pageWrapper.style.justifyContent = "center";
+      pageWrapper.style.alignItems = "center";
 
       const img = document.createElement("img");
       img.src = src;
       img.style.maxWidth = "100%";
       img.style.height = "auto";
-      img.style.pointerEvents = "none"; // 画像のドラッグ防止
+      img.style.pointerEvents = "none";
       
-      container.appendChild(img);
-      slider.appendChild(container);
+      pageWrapper.appendChild(img);
+      slider.appendChild(pageWrapper);
     });
 
     viewer.appendChild(slider);
-    updatePosition();
+    update();
   }
 
   function showToast(msg) {
@@ -55,54 +57,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function update() {
-    if (mode === "horizontal") {
-      updatePosition();
+    if (mode === "horizontal" && slider) {
+      // 100%単位で移動させる（1枚が100%なので、index * 100% でピッタリ合う）
+      // 右読み(row-reverse)なので、index=0は0%、index=1は+100%...となる
+      currentTranslate = index * 100;
+      slider.style.transform = `translateX(${currentTranslate}%)`;
+      prevTranslate = currentTranslate;
     }
+    
     pageNum.textContent = mode === "vertical" ? "タテ読み" : `${index + 1} / ${pages.length}`;
 
-    // サムネイルのアクティブ状態
+    // サムネイル・ボタンの更新
     document.querySelectorAll("#thumbnail-strip img").forEach((t, i) => {
       t.classList.toggle("active", i === index);
     });
     const at = document.querySelectorAll("#thumbnail-strip img")[index];
     if (at) at.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
 
-    // ボタンの有効/無効
     document.getElementById("btn-first").disabled = index === pages.length - 1;
     document.getElementById("btn-prev").disabled  = index === pages.length - 1;
     document.getElementById("btn-next").disabled  = index === 0;
     document.getElementById("btn-last").disabled  = index === 0;
   }
 
-  function updatePosition() {
-    // 右読みなので、indexが増えるほど左にスライドさせる
-    currentTranslate = index * (viewer.clientWidth);
-    prevTranslate = currentTranslate;
-    setSliderTransform(currentTranslate);
-  }
-
-  function setSliderTransform(tx) {
-    if (slider) slider.style.transform = `translateX(${tx}px)`;
-  }
-
   function next() {
-    if (index < pages.length - 1) {
-      index++;
-      update();
-    } else {
-      if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
-      else updatePosition();
-    }
+    if (index < pages.length - 1) { index++; update(); }
+    else if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
+    else update();
   }
 
   function prev() {
-    if (index > 0) {
-      index--;
-      update();
-    } else {
-      if (confirm("前の話に行っていい？")) location.href = prevEpisode;
-      else updatePosition();
-    }
+    if (index > 0) { index--; update(); }
+    else if (confirm("前の話に行っていい？")) location.href = prevEpisode;
+    else update();
   }
 
   window.toggleMode = function () {
@@ -111,8 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       viewer.className = "vertical";
       viewer.innerHTML = "";
       pages.forEach(p => {
-        const i = document.createElement("img");
-        i.src = p;
+        const i = document.createElement("img"); i.src = p;
         viewer.appendChild(i);
       });
       showToast("タテ読み");
@@ -125,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     update();
   };
 
-  // --- スワイプ挙動 ---
+  // --- スワイプ処理（%指定でズレを防止） ---
   viewer.addEventListener("touchstart", (e) => {
     if (mode === "vertical") return;
     isDragging = true;
@@ -135,36 +121,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   viewer.addEventListener("touchmove", (e) => {
     if (!isDragging || mode === "vertical") return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX;
-    // 現在のページ位置 + 指の移動分
-    setSliderTransform(prevTranslate + diff);
+    const x = e.touches[0].clientX;
+    const diffPx = x - startX;
+    // ピクセルでの移動量を、親要素に対するパーセンテージに変換
+    const diffPercent = (diffPx / viewer.clientWidth) * 100;
+    slider.style.transform = `translateX(${prevTranslate + diffPercent}%)`;
   }, {passive: true});
 
   viewer.addEventListener("touchend", (e) => {
     if (!isDragging || mode === "vertical") return;
     isDragging = false;
     const endX = e.changedTouches[0].clientX;
-    const diff = endX - startX;
-    const threshold = viewer.clientWidth / 4; // 1/4以上動かしたらめくる
+    const diffPx = endX - startX;
+    const threshold = 50; // 50px以上で移動
 
     slider.style.transition = "transform 0.3s ease-out";
-
-    if (diff > threshold) {
-      next(); // 右に引っ張る＝次のページへ
-    } else if (diff < -threshold) {
-      prev(); // 左に引っ張る＝前のページへ
-    } else {
-      updatePosition(); // 元に戻す
-    }
+    if (diffPx > threshold) next();      // 右へスワイプ＝次（右読み）
+    else if (diffPx < -threshold) prev(); // 左へスワイプ＝前（右読み）
+    else update();                        // 元に戻す
   });
 
-  // タップ操作（左半分で次、右半分で前）
+  // クリック（左半分で次、右半分で前）
   viewer.addEventListener("click", (e) => {
     if (mode === "vertical") return;
-    // スワイプとの誤爆防止（少しでも動いていたら無視）
-    if (isDragging) return;
-    
     const rect = viewer.getBoundingClientRect();
     const x = e.clientX - rect.left;
     if (x < rect.width / 2) next();
@@ -177,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "ArrowRight") prev();
   });
 
-  // サムネイル生成
+  // サムネイル
   const strip = document.getElementById("thumbnail-strip");
   pages.forEach((src, i) => {
     const t = document.createElement("img");
@@ -192,7 +171,5 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-next").addEventListener("click", prev);
   document.getElementById("btn-last").addEventListener("click", () => { index = 0; update(); });
 
-  // 起動
   initSlider();
-  update();
 });
