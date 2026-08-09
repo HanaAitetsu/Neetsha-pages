@@ -2,19 +2,52 @@ document.addEventListener("DOMContentLoaded", () => {
   let index = 0;
   let mode = "horizontal";
   const viewer = document.getElementById("viewer");
-  const img = document.getElementById("page");
   const pageNum = document.getElementById("pageNum");
+  const toast = document.getElementById("toast");
 
   // スワイプ・アニメーション用変数
   let startX = 0;
-  let currentX = 0;
+  let currentTranslate = 0;
+  let prevTranslate = 0;
   let isDragging = false;
-  let startTime = 0;
+  let animationID = 0;
+  let slider = null;
 
-  if (!viewer || !img) return;
+  if (!viewer) return;
+
+  // 初期化：スライダー（画像が横に並ぶ土台）を作成
+  function initSlider() {
+    viewer.innerHTML = ""; // 一旦空にする
+    slider = document.createElement("div");
+    slider.style.display = "flex";
+    slider.style.flexDirection = "row-reverse"; // 右読み用（1ページ目が右）
+    slider.style.width = `${pages.length * 100}%`;
+    slider.style.height = "100%";
+    slider.style.transition = "transform 0.3s ease-out";
+
+    pages.forEach((src, i) => {
+      const container = document.createElement("div");
+      container.style.width = "100%";
+      container.style.flexShrink = "0";
+      container.style.display = "flex";
+      container.style.justifyContent = "center";
+      container.style.alignItems = "flex-start";
+
+      const img = document.createElement("img");
+      img.src = src;
+      img.style.maxWidth = "100%";
+      img.style.height = "auto";
+      img.style.pointerEvents = "none"; // 画像のドラッグ防止
+      
+      container.appendChild(img);
+      slider.appendChild(container);
+    });
+
+    viewer.appendChild(slider);
+    updatePosition();
+  }
 
   function showToast(msg) {
-    const toast = document.getElementById("toast");
     toast.textContent = msg;
     toast.classList.add("show");
     clearTimeout(toast._timer);
@@ -22,10 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function update() {
-    img.style.transition = "none"; // 切り替え時はアニメーションをオフ
-    img.style.transform = "translateX(0)";
-    img.src = pages[index];
-    pageNum.textContent = `${index + 1} / ${pages.length}`;
+    if (mode === "horizontal") {
+      updatePosition();
+    }
+    pageNum.textContent = mode === "vertical" ? "タテ読み" : `${index + 1} / ${pages.length}`;
 
     // サムネイルのアクティブ状態
     document.querySelectorAll("#thumbnail-strip img").forEach((t, i) => {
@@ -41,22 +74,35 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-last").disabled  = index === 0;
   }
 
-  // ページ移動実行（演出付き）
-  function moveTo(newIndex) {
-    if (newIndex >= 0 && newIndex < pages.length) {
-      index = newIndex;
-      update();
-    }
+  function updatePosition() {
+    // 右読みなので、indexが増えるほど左にスライドさせる
+    currentTranslate = index * (viewer.clientWidth);
+    prevTranslate = currentTranslate;
+    setSliderTransform(currentTranslate);
+  }
+
+  function setSliderTransform(tx) {
+    if (slider) slider.style.transform = `translateX(${tx}px)`;
   }
 
   function next() {
-    if (index < pages.length - 1) moveTo(index + 1);
-    else if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
+    if (index < pages.length - 1) {
+      index++;
+      update();
+    } else {
+      if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
+      else updatePosition();
+    }
   }
 
   function prev() {
-    if (index > 0) moveTo(index - 1);
-    else if (confirm("前の話に行っていい？")) location.href = prevEpisode;
+    if (index > 0) {
+      index--;
+      update();
+    } else {
+      if (confirm("前の話に行っていい？")) location.href = prevEpisode;
+      else updatePosition();
+    }
   }
 
   window.toggleMode = function () {
@@ -69,82 +115,59 @@ document.addEventListener("DOMContentLoaded", () => {
         i.src = p;
         viewer.appendChild(i);
       });
-      pageNum.textContent = "タテ読み";
       showToast("タテ読み");
     } else {
       mode = "horizontal";
       viewer.className = "horizontal";
-      viewer.innerHTML = "";
-      viewer.appendChild(img);
-      update();
+      initSlider();
       showToast("ヨコ読み");
     }
+    update();
   };
 
-  // --- スワイプ挙動の強化 ---
-
+  // --- スワイプ挙動 ---
   viewer.addEventListener("touchstart", (e) => {
     if (mode === "vertical") return;
-    startX = e.touches[0].clientX;
-    startTime = Date.now();
     isDragging = true;
-    img.style.transition = "none"; // ドラッグ中はアニメーション無効
+    startX = e.touches[0].clientX;
+    slider.style.transition = "none";
   }, {passive: true});
 
   viewer.addEventListener("touchmove", (e) => {
     if (!isDragging || mode === "vertical") return;
-    currentX = e.touches[0].clientX;
+    const currentX = e.touches[0].clientX;
     const diff = currentX - startX;
-    
-    // 画像を指についてこさせる
-    img.style.transform = `translateX(${diff}px)`;
+    // 現在のページ位置 + 指の移動分
+    setSliderTransform(prevTranslate + diff);
   }, {passive: true});
 
   viewer.addEventListener("touchend", (e) => {
     if (!isDragging || mode === "vertical") return;
     isDragging = false;
-    
-    const diff = e.changedTouches[0].clientX - startX;
-    const deltaTime = Date.now() - startTime;
-    const threshold = window.innerWidth * 0.2; // 画面幅の20%以上でめくる
-    const velocity = Math.abs(diff) / deltaTime; // フリック速度
+    const endX = e.changedTouches[0].clientX;
+    const diff = endX - startX;
+    const threshold = viewer.clientWidth / 4; // 1/4以上動かしたらめくる
 
-    // アニメーション設定
-    img.style.transition = "transform 0.3s ease-out";
+    slider.style.transition = "transform 0.3s ease-out";
 
-    if (diff > threshold || (diff > 50 && velocity > 0.5)) {
-      // 右スワイプ（右読みでの次ページ）
-      if (index < pages.length - 1) {
-        img.style.transform = `translateX(${window.innerWidth}px)`;
-        setTimeout(next, 300);
-      } else {
-        // 最終ページで次へ
-        img.style.transform = "translateX(0)";
-        next();
-      }
-    } else if (diff < -threshold || (diff < -50 && velocity > 0.5)) {
-      // 左スワイプ（右読みでの前ページ）
-      if (index > 0) {
-        img.style.transform = `translateX(-${window.innerWidth}px)`;
-        setTimeout(prev, 300);
-      } else {
-        // 最初ページで戻る
-        img.style.transform = "translateX(0)";
-        prev();
-      }
+    if (diff > threshold) {
+      next(); // 右に引っ張る＝次のページへ
+    } else if (diff < -threshold) {
+      prev(); // 左に引っ張る＝前のページへ
     } else {
-      // キャンセル（元の位置に戻る）
-      img.style.transform = "translateX(0)";
+      updatePosition(); // 元に戻す
     }
   });
 
-  // クリック操作（右読み：左タップで次、右タップで前）
-  viewer.addEventListener("click", e => {
-    if (mode === "vertical" || isDragging) return;
-    // スワイプとクリックを区別（あまり動いてなければクリックとみなす）
-    if (Math.abs(currentX - startX) > 10) return; 
-
-    if (e.clientX < window.innerWidth / 2) next();
+  // タップ操作（左半分で次、右半分で前）
+  viewer.addEventListener("click", (e) => {
+    if (mode === "vertical") return;
+    // スワイプとの誤爆防止（少しでも動いていたら無視）
+    if (isDragging) return;
+    
+    const rect = viewer.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width / 2) next();
     else prev();
   });
 
@@ -159,17 +182,17 @@ document.addEventListener("DOMContentLoaded", () => {
   pages.forEach((src, i) => {
     const t = document.createElement("img");
     t.src = src;
-    t.title = (i + 1) + "ページ";
     t.addEventListener("click", () => { index = i; update(); });
     strip.appendChild(t);
   });
 
-  // ボタンイベント
+  // ボタン
   document.getElementById("btn-first").addEventListener("click", () => { index = pages.length - 1; update(); });
   document.getElementById("btn-prev").addEventListener("click", next);
   document.getElementById("btn-next").addEventListener("click", prev);
   document.getElementById("btn-last").addEventListener("click", () => { index = 0; update(); });
 
-  showToast("ヨコ読み");
+  // 起動
+  initSlider();
   update();
 });
