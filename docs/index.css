@@ -259,3 +259,29 @@ hr {
 .spread-view img.solo {
   width: 100% !important; /* 1枚しかない時は全幅 */
 }
+
+/* スライダー内の各スライド（ページを包む枠） */
+.slide-wrapper {
+  flex: 0 0 100%;
+  width: 100%;
+  display: flex !important;
+  flex-direction: row-reverse !important; /* 右読み */
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+/* 画像のサイズ指定 */
+.img-single {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.img-spread {
+  width: 50% !important; /* iOSで確実に半分にする */
+  height: auto;
+  max-width: 50%;
+  object-fit: contain;
+}
