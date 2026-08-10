@@ -83,23 +83,25 @@ a:active {
 }
 /* ツールバー */
 /* 変更後 */
+/* ツールバーのボタンが並ぶように */
 #toolbar {
-  margin: 0.5em 0;
+  margin: 10px 0;
   display: flex;
   justify-content: center;
-  gap: 1em;
-  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; /* 画面が狭いときは折り返す */
 }
+
 #toolbar button {
-  font-size: 15px;
-  padding: 8px 20px;
+  min-width: 140px; /* ボタンの幅を揃える */
+  padding: 10px;
+  cursor: pointer;
   background: #444;
   color: #fff;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
-  font-family: serif;
 }
+
 #toolbar button:hover {
   background: #666;
 }
