@@ -260,28 +260,41 @@ hr {
   width: 100% !important; /* 1枚しかない時は全幅 */
 }
 
-/* スライダー内の各スライド（ページを包む枠） */
+/* スライダー全体のコンテナ */
+#viewer.horizontal {
+  display: flex;
+  align-items: center; /* 上下中央 */
+  justify-content: center; /* 左右中央 */
+  background-color: #222;
+  min-height: 80vh; /* 少し高めに設定すると見やすいです */
+}
+
+/* スライド1枚分（単ページなら1枚、見開きなら2枚入る枠） */
 .slide-wrapper {
   flex: 0 0 100%;
   width: 100%;
+  height: 100%;
   display: flex !important;
   flex-direction: row-reverse !important; /* 右読み */
-  justify-content: center;
-  align-items: flex-start;
-  box-sizing: border-box;
+  justify-content: center; /* 左右中央寄せ */
+  align-items: center; /* 上下中央寄せ */
+  overflow: hidden;
 }
 
-/* 画像のサイズ指定 */
-.img-single {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
+/* 見開き時の画像 */
+.img-spread {
+  width: auto !important;
+  height: auto !important;
+  max-width: 50% !important; /* 2枚で100% */
+  max-height: 90vh !important; /* 画面からはみ出さない */
   object-fit: contain;
 }
 
-.img-spread {
-  width: 50% !important; /* iOSで確実に半分にする */
-  height: auto;
-  max-width: 50%;
+/* 単ページ時の画像 */
+.img-single {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 90vh !important;
   object-fit: contain;
 }
