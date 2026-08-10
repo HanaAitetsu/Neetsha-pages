@@ -1,22 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
-  let index = 0;
-  let isVertical = false; // 縦読みモードか
-  let isSpread = false;   // 見開きモードか
+  let pageIndex = 0;
+  let isVertical = false;
+  let isSpread = false;
   
   const viewer = document.getElementById("viewer");
   const pageNum = document.getElementById("pageNum");
   const toast = document.getElementById("toast");
-  const btnSpread = document.getElementById("btn-spread");
+  // btnSpreadの取得は残しますが、表示制御は削除します
 
   let startX = 0;
-  let currentTranslate = 0;
-  let prevTranslate = 0;
   let isDragging = false;
   let slider = null;
 
   if (!viewer) return;
 
-  // ページをグループ化（1ページ目からペアにする）
   function getSlides() {
     if (isVertical || !isSpread) {
       return pages.map(p => [p]);
@@ -31,29 +28,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function getSlideIndex() {
+    const slides = getSlides();
+    const idx = slides.findIndex(s => s.includes(pages[pageIndex]));
+    return idx === -1 ? 0 : idx;
+  }
+
   function initSlider() {
     viewer.innerHTML = "";
+    
     if (isVertical) {
       viewer.className = "vertical";
+      // ボタンの表示制御（hidden/visible）を削除しました
       pages.forEach(p => {
         const i = document.createElement("img"); i.src = p;
         viewer.appendChild(i);
       });
-      btnSpread.style.display = "none"; // 縦読み時は見開きボタンを隠す
+      update(); // ページ番号更新のため
       return;
     }
 
-    btnSpread.style.display = "inline-block";
     viewer.className = "horizontal";
     slider = document.createElement("div");
     slider.style.display = "flex";
     slider.style.flexDirection = "row-reverse";
-    slider.style.height = "100%";
     slider.style.width = "100%";
+    slider.style.height = "100%";
     slider.style.transition = "transform 0.3s ease-out";
 
-    const slides = getSlides();
-    slides.forEach((group) => {
+    getSlides().forEach((group) => {
       const pageWrapper = document.createElement("div");
       pageWrapper.className = "slide-wrapper";
       
@@ -61,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const img = document.createElement("img");
         img.src = src;
         img.className = isSpread ? "img-spread" : "img-single";
-        img.style.pointerEvents = "none";
         pageWrapper.appendChild(img);
       });
       slider.appendChild(pageWrapper);
@@ -73,47 +75,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function update() {
     const slides = getSlides();
-    if (index >= slides.length) index = slides.length - 1;
+    const currentSlideIdx = getSlideIndex();
 
     if (!isVertical && slider) {
-      currentTranslate = index * 100;
-      slider.style.transform = `translateX(${currentTranslate}%)`;
-      prevTranslate = currentTranslate;
+      slider.style.transform = `translateX(${currentSlideIdx * 100}%)`;
     }
 
-    // ページ番号表示
     if (isVertical) {
       pageNum.textContent = "タテ読み";
     } else {
-      const currentPages = slides[index];
+      const currentPages = slides[currentSlideIdx];
       const first = pages.indexOf(currentPages[0]) + 1;
       const last = pages.indexOf(currentPages[currentPages.length - 1]) + 1;
       pageNum.textContent = (first === last) ? `${first} / ${pages.length}` : `${first}-${last} / ${pages.length}`;
     }
 
-    // サムネイルとボタン
-    const realIdx = pages.indexOf(slides[index][0]);
     document.querySelectorAll("#thumbnail-strip img").forEach((t, i) => {
-      t.classList.toggle("active", i === realIdx);
+      t.classList.toggle("active", i === pageIndex);
     });
-    document.getElementById("btn-first").disabled = index === slides.length - 1;
-    document.getElementById("btn-prev").disabled  = index === slides.length - 1;
-    document.getElementById("btn-next").disabled  = index === 0;
-    document.getElementById("btn-last").disabled  = index === 0;
+
+    const sIdx = currentSlideIdx;
+    document.getElementById("btn-first").disabled = sIdx === slides.length - 1;
+    document.getElementById("btn-prev").disabled  = sIdx === slides.length - 1;
+    document.getElementById("btn-next").disabled  = sIdx === 0;
+    document.getElementById("btn-last").disabled  = sIdx === 0;
   }
 
-  // --- 切り替えボタン ---
   window.toggleLayout = function() {
     isVertical = !isVertical;
     showToast(isVertical ? "タテ読み" : "ヨコ読み");
-    index = 0;
     initSlider();
   };
 
   window.toggleSpread = function() {
     isSpread = !isSpread;
+    // タテ読み中に見開きを押したら、ヨコ読みモードに強制移行して効果を見せる
+    if (isVertical) {
+      isVertical = false;
+    }
     showToast(isSpread ? "見開きモード" : "単ページモード");
-    index = 0;
     initSlider();
   };
 
@@ -126,18 +126,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function next() {
     const slides = getSlides();
-    if (index < slides.length - 1) { index++; update(); }
-    else if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
-    else update();
+    const currentSlideIdx = getSlideIndex();
+    if (currentSlideIdx < slides.length - 1) {
+      const nextSlide = slides[currentSlideIdx + 1];
+      pageIndex = pages.indexOf(nextSlide[0]);
+      update();
+    } else {
+      if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
+      else update();
+    }
   }
 
   function prev() {
-    if (index > 0) { index--; update(); }
-    else if (confirm("前の話に行っていい？")) location.href = prevEpisode;
-    else update();
+    const currentSlideIdx = getSlideIndex();
+    const slides = getSlides();
+    if (currentSlideIdx > 0) {
+      const prevSlide = slides[currentSlideIdx - 1];
+      pageIndex = pages.indexOf(prevSlide[0]);
+      update();
+    } else {
+      if (confirm("前の話に行っていい？")) location.href = prevEpisode;
+      else update();
+    }
   }
 
-  // スワイプ・クリック
   viewer.addEventListener("touchstart", (e) => {
     if (isVertical) return;
     isDragging = true;
@@ -148,7 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
   viewer.addEventListener("touchmove", (e) => {
     if (!isDragging || isVertical) return;
     const diffPercent = ((e.touches[0].clientX - startX) / viewer.clientWidth) * 100;
-    slider.style.transform = `translateX(${prevTranslate + diffPercent}%)`;
+    const currentPos = getSlideIndex() * 100;
+    slider.style.transform = `translateX(${currentPos + diffPercent}%)`;
   }, {passive: true});
 
   viewer.addEventListener("touchend", (e) => {
@@ -168,23 +181,28 @@ document.addEventListener("DOMContentLoaded", () => {
     else prev();
   });
 
-  // サムネイル
   const strip = document.getElementById("thumbnail-strip");
   pages.forEach((src, i) => {
     const t = document.createElement("img");
     t.src = src;
     t.addEventListener("click", () => {
-      const slides = getSlides();
-      index = slides.findIndex(s => s.includes(pages[i]));
+      pageIndex = i;
       update();
     });
     strip.appendChild(t);
   });
 
-  document.getElementById("btn-first").onclick = () => { index = getSlides().length - 1; update(); };
+  document.getElementById("btn-first").onclick = () => { 
+    const slides = getSlides();
+    pageIndex = pages.indexOf(slides[slides.length - 1][0]);
+    update();
+  };
   document.getElementById("btn-prev").onclick = next;
   document.getElementById("btn-next").onclick = prev;
-  document.getElementById("btn-last").onclick = () => { index = 0; update(); };
+  document.getElementById("btn-last").onclick = () => { 
+    pageIndex = 0; 
+    update(); 
+  };
 
   initSlider();
 });
