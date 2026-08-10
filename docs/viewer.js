@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  let index = 0;
-  let mode = "horizontal";
+  let index = 0; // スライドの番号
+  let mode = "single"; // single, spread, vertical
   const viewer = document.getElementById("viewer");
   const pageNum = document.getElementById("pageNum");
   const toast = document.getElementById("toast");
@@ -13,41 +13,118 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!viewer) return;
 
-  // 初期化：スライダー構造の構築
+  // モードに合わせてページをグループ化する関数
+  function getSlides() {
+    if (mode === "single" || mode === "vertical") {
+      return pages.map(p => [p]); // 1枚ずつ
+    } else {
+      // 見開きモード：1枚目（表紙）は単体、2枚目以降は2枚ずつペア
+      const slides = [[pages[0]]];
+      for (let i = 1; i < pages.length; i += 2) {
+        const pair = [];
+        pair.push(pages[i]);
+        if (pages[i + 1]) pair.push(pages[i + 1]);
+        slides.push(pair);
+      }
+      return slides;
+    }
+  }
+
   function initSlider() {
     viewer.innerHTML = "";
-    viewer.style.display = "block"; // 縦読みから戻った時用
-    viewer.style.overflow = "hidden";
-    viewer.style.position = "relative";
+    if (mode === "vertical") {
+      viewer.className = "vertical";
+      pages.forEach(p => {
+        const i = document.createElement("img"); i.src = p;
+        viewer.appendChild(i);
+      });
+      return;
+    }
 
+    viewer.className = "horizontal";
     slider = document.createElement("div");
     slider.style.display = "flex";
-    slider.style.flexDirection = "row-reverse"; // 右から左へ並べる（右読み）
+    slider.style.flexDirection = "row-reverse"; // 右読み
     slider.style.height = "100%";
-    slider.style.width = "100%"; 
+    slider.style.width = "100%";
     slider.style.transition = "transform 0.3s ease-out";
 
-    pages.forEach((src) => {
+    const slides = getSlides();
+    slides.forEach((group) => {
       const pageWrapper = document.createElement("div");
-      pageWrapper.style.flex = "0 0 100%"; // 1枚を必ずviewerと同じ幅にする
-      pageWrapper.style.width = "100%";
+      pageWrapper.style.flex = "0 0 100%";
       pageWrapper.style.display = "flex";
+      pageWrapper.style.flexDirection = "row-reverse"; // ペア内も右読み
       pageWrapper.style.justifyContent = "center";
-      pageWrapper.style.alignItems = "center";
-
-      const img = document.createElement("img");
-      img.src = src;
-      img.style.maxWidth = "100%";
-      img.style.height = "auto";
-      img.style.pointerEvents = "none";
       
-      pageWrapper.appendChild(img);
+      group.forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        if (mode === "spread") {
+          img.className = group.length === 1 ? "solo" : "pair";
+        }
+        img.style.maxWidth = "100%";
+        img.style.height = "auto";
+        img.style.pointerEvents = "none";
+        pageWrapper.appendChild(img);
+      });
       slider.appendChild(pageWrapper);
     });
 
     viewer.appendChild(slider);
     update();
   }
+
+  function update() {
+    const slides = getSlides();
+    // インデックスが範囲外にならないよう調整
+    if (index >= slides.length) index = slides.length - 1;
+
+    if (mode !== "vertical" && slider) {
+      currentTranslate = index * 100;
+      slider.style.transform = `translateX(${currentTranslate}%)`;
+      prevTranslate = currentTranslate;
+    }
+
+    // ページ番号表示
+    if (mode === "vertical") {
+      pageNum.textContent = "タテ読み";
+    } else {
+      const currentPages = slides[index];
+      // 実際に何ページ目かを表示（例: 2-3 / 10）
+      const firstPageIdx = pages.indexOf(currentPages[0]) + 1;
+      const lastPageIdx = pages.indexOf(currentPages[currentPages.length - 1]) + 1;
+      pageNum.textContent = firstPageIdx === lastPageIdx ? 
+        `${firstPageIdx} / ${pages.length}` : `${firstPageIdx}-${lastPageIdx} / ${pages.length}`;
+    }
+
+    // サムネイルとボタン
+    const realIdx = pages.indexOf(slides[index][0]);
+    document.querySelectorAll("#thumbnail-strip img").forEach((t, i) => {
+      t.classList.toggle("active", i === realIdx);
+    });
+
+    document.getElementById("btn-first").disabled = index === slides.length - 1;
+    document.getElementById("btn-prev").disabled  = index === slides.length - 1;
+    document.getElementById("btn-next").disabled  = index === 0;
+    document.getElementById("btn-last").disabled  = index === 0;
+  }
+
+  // --- モード切替 ---
+  window.toggleMode = function () {
+    if (mode === "single") {
+      mode = "spread";
+      showToast("見開き読み");
+    } else if (mode === "spread") {
+      mode = "vertical";
+      showToast("タテ読み");
+    } else {
+      mode = "single";
+      showToast("ヨコ読み");
+    }
+    index = 0; // モード切替時は先頭へ（位置計算が複雑になるため）
+    initSlider();
+  };
 
   function showToast(msg) {
     toast.textContent = msg;
@@ -56,32 +133,9 @@ document.addEventListener("DOMContentLoaded", () => {
     toast._timer = setTimeout(() => toast.classList.remove("show"), 2000);
   }
 
-  function update() {
-    if (mode === "horizontal" && slider) {
-      // 100%単位で移動させる（1枚が100%なので、index * 100% でピッタリ合う）
-      // 右読み(row-reverse)なので、index=0は0%、index=1は+100%...となる
-      currentTranslate = index * 100;
-      slider.style.transform = `translateX(${currentTranslate}%)`;
-      prevTranslate = currentTranslate;
-    }
-    
-    pageNum.textContent = mode === "vertical" ? "タテ読み" : `${index + 1} / ${pages.length}`;
-
-    // サムネイル・ボタンの更新
-    document.querySelectorAll("#thumbnail-strip img").forEach((t, i) => {
-      t.classList.toggle("active", i === index);
-    });
-    const at = document.querySelectorAll("#thumbnail-strip img")[index];
-    if (at) at.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-
-    document.getElementById("btn-first").disabled = index === pages.length - 1;
-    document.getElementById("btn-prev").disabled  = index === pages.length - 1;
-    document.getElementById("btn-next").disabled  = index === 0;
-    document.getElementById("btn-last").disabled  = index === 0;
-  }
-
   function next() {
-    if (index < pages.length - 1) { index++; update(); }
+    const slides = getSlides();
+    if (index < slides.length - 1) { index++; update(); }
     else if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
     else update();
   }
@@ -92,26 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else update();
   }
 
-  window.toggleMode = function () {
-    if (mode === "horizontal") {
-      mode = "vertical";
-      viewer.className = "vertical";
-      viewer.innerHTML = "";
-      pages.forEach(p => {
-        const i = document.createElement("img"); i.src = p;
-        viewer.appendChild(i);
-      });
-      showToast("タテ読み");
-    } else {
-      mode = "horizontal";
-      viewer.className = "horizontal";
-      initSlider();
-      showToast("ヨコ読み");
-    }
-    update();
-  };
-
-  // --- スワイプ処理（%指定でズレを防止） ---
+  // スワイプ・クリック等のイベントは前回と同じ
   viewer.addEventListener("touchstart", (e) => {
     if (mode === "vertical") return;
     isDragging = true;
@@ -121,55 +156,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
   viewer.addEventListener("touchmove", (e) => {
     if (!isDragging || mode === "vertical") return;
-    const x = e.touches[0].clientX;
-    const diffPx = x - startX;
-    // ピクセルでの移動量を、親要素に対するパーセンテージに変換
-    const diffPercent = (diffPx / viewer.clientWidth) * 100;
+    const diffPercent = ((e.touches[0].clientX - startX) / viewer.clientWidth) * 100;
     slider.style.transform = `translateX(${prevTranslate + diffPercent}%)`;
   }, {passive: true});
 
   viewer.addEventListener("touchend", (e) => {
     if (!isDragging || mode === "vertical") return;
     isDragging = false;
-    const endX = e.changedTouches[0].clientX;
-    const diffPx = endX - startX;
-    const threshold = 50; // 50px以上で移動
-
+    const diffPx = e.changedTouches[0].clientX - startX;
     slider.style.transition = "transform 0.3s ease-out";
-    if (diffPx > threshold) next();      // 右へスワイプ＝次（右読み）
-    else if (diffPx < -threshold) prev(); // 左へスワイプ＝前（右読み）
-    else update();                        // 元に戻す
+    if (diffPx > 50) next();
+    else if (diffPx < -50) prev();
+    else update();
   });
 
-  // クリック（左半分で次、右半分で前）
   viewer.addEventListener("click", (e) => {
     if (mode === "vertical") return;
     const rect = viewer.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    if (x < rect.width / 2) next();
+    if (e.clientX - rect.left < rect.width / 2) next();
     else prev();
   });
 
-  // キーボード
-  document.addEventListener("keydown", e => {
-    if (e.key === "ArrowLeft")  next();
-    if (e.key === "ArrowRight") prev();
-  });
-
-  // サムネイル
+  // サムネイルクリック時は、そのページが含まれるスライドを探す
   const strip = document.getElementById("thumbnail-strip");
   pages.forEach((src, i) => {
     const t = document.createElement("img");
     t.src = src;
-    t.addEventListener("click", () => { index = i; update(); });
+    t.addEventListener("click", () => {
+      const slides = getSlides();
+      index = slides.findIndex(s => s.includes(pages[i]));
+      update();
+    });
     strip.appendChild(t);
   });
 
-  // ボタン
-  document.getElementById("btn-first").addEventListener("click", () => { index = pages.length - 1; update(); });
-  document.getElementById("btn-prev").addEventListener("click", next);
-  document.getElementById("btn-next").addEventListener("click", prev);
-  document.getElementById("btn-last").addEventListener("click", () => { index = 0; update(); });
+  document.getElementById("btn-first").onclick = () => { index = getSlides().length - 1; update(); };
+  document.getElementById("btn-prev").onclick = next;
+  document.getElementById("btn-next").onclick = prev;
+  document.getElementById("btn-last").onclick = () => { index = 0; update(); };
 
   initSlider();
 });
