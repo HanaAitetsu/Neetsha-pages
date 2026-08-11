@@ -269,23 +269,26 @@ hr {
   height: auto !important; /* 高さを固定しない */
 }
 
-/* 単ページモード：上に詰める、背景はメインと同じ */
-.slide-wrapper.single-style {
-  align-items: flex-start; /* 上端に合わせる */
-  background-color: #eee;
+/* スライド1枚分（単なら100%、見開きなら50%×2を包む） */
+.slide-wrapper {
+  flex: 0 0 100%;
+  width: 100%;
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  justify-content: center;
+  align-items: flex-start; /* 常に上端に合わせる（画像が長くても縮ませない） */
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* 見開きモード：上下左右中央、背景は黒、最低1画面分の高さを確保 */
+/* 見開きモードの背景と余白 */
 .slide-wrapper.spread-style {
-  align-items: center !important; /* 上下中央 */
-  justify-content: center !important; /* 左右中央 */
-  background-color: #222;
-  /* ここが重要：画面いっぱいの高さを最低限確保することで、画像が短い時に「余白」が生まれる */
-  min-height: 100vh; 
-  padding: 20px 0; /* 少しだけ上下に隙間を作ると綺麗に見えます */
+  background-color: #222; /* 見開きは黒背景 */
+  /* 見開き時、画像が短くても少し余白が見えるように最小高さを設定 */
+  min-height: 60vh; 
 }
 
-/* 画像の設定は前回と同じ（縮ませない設定） */
+/* 単ページ画像：横幅100% */
 .img-single {
   width: 100% !important;
   max-width: 100% !important;
@@ -293,6 +296,7 @@ hr {
   display: block;
 }
 
+/* 見開き画像：横幅50%を強制（縮ませない） */
 .img-spread {
   width: 50% !important;
   max-width: 50% !important;
