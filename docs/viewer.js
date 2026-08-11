@@ -34,17 +34,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return idx === -1 ? 0 : idx;
   }
 
+  // --- initSlider関数の中身を以下に差し替え ---
   function initSlider() {
     viewer.innerHTML = "";
     
     if (isVertical) {
       viewer.className = "vertical";
-      // ボタンの表示制御（hidden/visible）を削除しました
       pages.forEach(p => {
         const i = document.createElement("img"); i.src = p;
         viewer.appendChild(i);
       });
-      update(); // ページ番号更新のため
+      update();
       return;
     }
 
@@ -53,12 +53,12 @@ document.addEventListener("DOMContentLoaded", () => {
     slider.style.display = "flex";
     slider.style.flexDirection = "row-reverse";
     slider.style.width = "100%";
-    slider.style.height = "100%";
     slider.style.transition = "transform 0.3s ease-out";
 
     getSlides().forEach((group) => {
       const pageWrapper = document.createElement("div");
-      pageWrapper.className = "slide-wrapper";
+      // ここで単ページか見開きかでクラスを分ける
+      pageWrapper.className = "slide-wrapper " + (isSpread ? "spread-style" : "single-style");
       
       group.forEach(src => {
         const img = document.createElement("img");
