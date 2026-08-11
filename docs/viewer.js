@@ -49,9 +49,8 @@ function initSlider() {
     }
 
     viewer.className = "horizontal";
-    // 単ページは画像に合わせる、見開きは最低1画面分
+    // 高さを自動(auto)に統一することで、画像が縮むのを防ぎます
     viewer.style.height = "auto";
-    viewer.style.minHeight = isSpread ? "100vh" : "0";
 
     slider = document.createElement("div");
     slider.style.display = "flex";
@@ -61,7 +60,6 @@ function initSlider() {
 
     getSlides().forEach((group) => {
       const pageWrapper = document.createElement("div");
-      // モード別のクラスを付与
       pageWrapper.className = "slide-wrapper " + (isSpread ? "spread-style" : "single-style");
       
       group.forEach(src => {
