@@ -288,29 +288,45 @@ hr {
   min-height: auto;
 }
 
-/* 見開き：中央に寄せ、背景は黒、最低1画面分の高さを確保 */
+/* ① iPhoneでの余白が広すぎる問題を解消 */
 .spread-style {
   align-items: center !important; 
   background-color: #222;
-  min-height: 100vh;
+  /* 画面の高さ100%ではなく、最低限の高さ(60%程度)か、中身に合わせる */
+  min-height: 70vh; 
+  padding: 20px 0;
 }
 
-/* --- 画像設定 --- */
+/* iPhone/iPadなど画面が小さい時は、さらに高さを抑える */
+@media screen and (max-width: 768px) {
+  .spread-style {
+    min-height: 50vh; 
+  }
+}
 
-/* 単ページ：横幅いっぱい、縦制限なし */
-.img-single {
+/* ② 1枚しかない時に見開きでも小さくならないようにする */
+/* スライドの中に画像が1枚しかない（奇数ページの最後など）場合の設定 */
+.slide-wrapper img:only-child {
   width: 100% !important;
   max-width: 100% !important;
-  height: auto !important;
-  display: block;
+  max-height: 95vh !important;
+  object-fit: contain;
 }
 
-/* 見開き：横幅50%固定、縦は画面内に収まるよう配慮 */
+/* 見開き用の画像（2枚並んでいる時用） */
 .img-spread {
   width: 50% !important;
   max-width: 50% !important;
   height: auto !important;
   max-height: 95vh !important;
   object-fit: contain;
+  display: block;
+}
+
+/* 単ページ用の画像 */
+.img-single {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
   display: block;
 }
