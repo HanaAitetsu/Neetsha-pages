@@ -60,11 +60,7 @@ a:active {
   background: #222;
   text-align: center;
 }
-/* ビューワー全体の背景をメイン枠と同じ色に（余白を同化させる） */
-#viewer.horizontal {
-  background-color: #eee; /* メインの背景色と合わせる */
-  min-height: auto; /* 固定の高さを解除 */
-}
+
 #viewer.horizontal img {
   display: block;
   margin: 0 auto;
@@ -264,41 +260,51 @@ hr {
   width: 100% !important; /* 1枚しかない時は全幅 */
 }
 
-/* スライダー全体のコンテナ */
+/* ビューワーの基本設定 */
 #viewer.horizontal {
+  background-color: #eee;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  /* 縦の固定高さを削除 */
+  height: auto;
+  min-height: auto;
+}
+
+/* スライドの枠 */
+.slide-wrapper {
+  flex: 0 0 100%; /* これが重要：1枚が必ず横幅100%を占有する */
+  width: 100%;
   display: flex;
-  align-items: center; /* 上下中央 */
-  justify-content: center; /* 左右中央 */
-  background-color: #222;
-  min-height: 80vh; /* 少し高めに設定すると見やすいです */
+  flex-direction: row-reverse;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-/* 単ページ用の設定：上に詰める */
+/* 単ページモードのスタイル：横幅フル、上詰め */
 .slide-wrapper.single-style {
-  align-items: flex-start !important; /* 上端に寄せる */
-  padding: 0;
+  align-items: flex-start;
 }
 
-/* 見開き用の設定：中央に寄せる */
-.slide-wrapper.spread-style {
-  align-items: center !important; 
-  min-height: 80vh; /* 見開きの時だけある程度の高さを確保 */
-  background-color: #222; /* 見開きは「鑑賞」っぽく黒背景に */
-}
-/* 単ページ画像：画面幅いっぱい、縦制限なし */
 .img-single {
-  width: 100% !important;
-  height: auto !important;
+  width: 100% !important; /* 横幅をビューワーに合わせる */
   max-width: 100% !important;
-  max-height: none !important; /* 縦の制限をなくす */
+  height: auto !important;
   display: block;
 }
 
-/* 見開き画像：画面に収まるように制限 */
+/* 見開きモードのスタイル：中央寄せ、画面に収める */
+.slide-wrapper.spread-style {
+  align-items: center;
+  background-color: #222;
+  /* 見開きの時は、画面の高さを基準にする */
+  height: 90vh; 
+}
+
 .img-spread {
   width: auto !important;
   height: auto !important;
   max-width: 50% !important;
-  max-height: 95vh !important; /* 画面に収める */
+  max-height: 100% !important; /* 枠（90vh）の中に収める */
   object-fit: contain;
 }
