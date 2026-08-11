@@ -39,7 +39,7 @@ function initSlider() {
     
     if (isVertical) {
       viewer.className = "vertical";
-      viewer.style.height = "auto"; // 縦読みは高さ自由
+      viewer.style.height = "auto";
       pages.forEach(p => {
         const i = document.createElement("img"); i.src = p;
         viewer.appendChild(i);
@@ -49,14 +49,13 @@ function initSlider() {
     }
 
     viewer.className = "horizontal";
-    // 単ページの時は高さを自動に、見開きの時は画面に合わせる
-    viewer.style.height = isSpread ? "90vh" : "auto";
+    // 高さを自動(auto)に統一することで、画像が縮むのを防ぎます
+    viewer.style.height = "auto";
 
     slider = document.createElement("div");
     slider.style.display = "flex";
     slider.style.flexDirection = "row-reverse";
     slider.style.width = "100%";
-    slider.style.height = "100%";
     slider.style.transition = "transform 0.3s ease-out";
 
     getSlides().forEach((group) => {
