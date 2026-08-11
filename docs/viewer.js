@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   let pageIndex = 0;
   let isVertical = false;
-  let isSpread = false; // 初期は単ページ
+  let isSpread = false;
   
   const viewer = document.getElementById("viewer");
   const pageNum = document.getElementById("pageNum");
@@ -14,11 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!viewer) return;
 
   function getSlides() {
-    // 縦読み or 単ページモード
     if (isVertical || !isSpread) {
       return pages.map(p => [p]);
     } else {
-      // 見開きモード（0-1, 2-3...でペアを作る）
       const slides = [];
       for (let i = 0; i < pages.length; i += 2) {
         const pair = [pages[i]];
@@ -37,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function initSlider() {
     viewer.innerHTML = "";
-    
     if (isVertical) {
       viewer.className = "vertical";
       viewer.style.height = "auto";
@@ -60,17 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     getSlides().forEach((group) => {
       const pageWrapper = document.createElement("div");
-      
-      // ここでクラスを正しく割り当て
-      if (isSpread) {
-        pageWrapper.className = "slide-wrapper spread-style";
-      } else {
-        pageWrapper.className = "slide-wrapper single-style";
-      }
+      pageWrapper.className = "slide-wrapper " + (isSpread ? "spread-style" : "single-style");
       
       group.forEach(src => {
         const img = document.createElement("img");
         img.src = src;
+        // クラスを付与（CSSのonly-child判定が効くようになります）
         img.className = isSpread ? "img-spread" : "img-single";
         pageWrapper.appendChild(img);
       });
@@ -102,12 +94,54 @@ document.addEventListener("DOMContentLoaded", () => {
       t.classList.toggle("active", i === pageIndex);
     });
 
-    const sIdx = currentSlideIdx;
-    document.getElementById("btn-first").disabled = sIdx === slides.length - 1;
-    document.getElementById("btn-prev").disabled  = sIdx === slides.length - 1;
-    document.getElementById("btn-next").disabled  = sIdx === 0;
-    document.getElementById("btn-last").disabled  = sIdx === 0;
+    // ボタンの有効・無効管理（全ページ・最初/最後ページ）
+    const totalSlides = slides.length;
+    document.getElementById("btn-first").disabled = currentSlideIdx === totalSlides - 1;
+    document.getElementById("btn-prev").disabled  = false; // 常に有効（話移動があるため）
+    document.getElementById("btn-next").disabled  = false; // 常に有効（話移動があるため）
+    document.getElementById("btn-last").disabled  = currentSlideIdx === 0;
   }
+
+  // --- ボタン・ナビゲーションの役割を明確化 ---
+
+  // 次へ（右読み：インデックス増）
+  function next() {
+    const slides = getSlides();
+    const currentSlideIdx = getSlideIndex();
+    if (currentSlideIdx < slides.length - 1) {
+      pageIndex = pages.indexOf(slides[currentSlideIdx + 1][0]);
+      update();
+    } else {
+      // 最終ページなら次の話へ
+      if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
+    }
+  }
+
+  // 前へ（右読み：インデックス減）
+  function prev() {
+    const currentSlideIdx = getSlideIndex();
+    const slides = getSlides();
+    if (currentSlideIdx > 0) {
+      pageIndex = pages.indexOf(slides[currentSlideIdx - 1][0]);
+      update();
+    } else {
+      // 最初ページなら前の話へ
+      if (confirm("前の話に行っていい？")) location.href = prevEpisode;
+    }
+  }
+
+  // 最初・最後の「ページ」へ
+  function goToFirstPageOfChapter() {
+    pageIndex = 0;
+    update();
+  }
+
+  function goToLastPageOfChapter() {
+    pageIndex = pages.length - 1;
+    update();
+  }
+
+  // --- イベント登録 ---
 
   window.toggleLayout = function() {
     isVertical = !isVertical;
@@ -116,47 +150,19 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.toggleSpread = function() {
-    isSpread = !isSpread; // 反転
-    if (isVertical) isVertical = false; // 縦読みなら強制解除
+    isSpread = !isSpread;
+    if (isVertical) isVertical = false;
     showToast(isSpread ? "見開きモード" : "単ページモード");
     initSlider();
   };
 
   function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove("show"), 2000);
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove("show"), 2000);
   }
 
-  function next() {
-    const slides = getSlides();
-    const currentSlideIdx = getSlideIndex();
-    if (currentSlideIdx < slides.length - 1) {
-      pageIndex = pages.indexOf(slides[currentSlideIdx + 1][0]);
-      update();
-    } else if (confirm("次の話に進んじゃうぞい！")) {
-      location.href = nextEpisode;
-    } else {
-      update();
-    }
-  }
-
-  function prev() {
-    const currentSlideIdx = getSlideIndex();
-    const slides = getSlides();
-    if (currentSlideIdx > 0) {
-      pageIndex = pages.indexOf(slides[currentSlideIdx - 1][0]);
-      update();
-    } else if (confirm("前の話に行っていい？")) {
-      location.href = prevEpisode;
-    } else {
-      update();
-    }
-  }
-
-  // イベント登録（以下は前回と同様）
   viewer.addEventListener("touchstart", (e) => {
     if (isVertical) return;
     isDragging = true; startX = e.touches[0].clientX;
@@ -185,17 +191,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const strip = document.getElementById("thumbnail-strip");
   pages.forEach((src, i) => {
-    const t = document.createElement("img"); t.src = src;
+    const t = document.createElement("img");
+    t.src = src;
     t.addEventListener("click", () => { pageIndex = i; update(); });
     strip.appendChild(t);
   });
 
-  document.getElementById("btn-first").onclick = () => { 
-    const s = getSlides(); pageIndex = pages.indexOf(s[s.length - 1][0]); update(); 
-  };
-  document.getElementById("btn-prev").onclick = next;
-  document.getElementById("btn-next").onclick = prev;
-  document.getElementById("btn-last").onclick = () => { pageIndex = 0; update(); };
+  // ボタンに機能を割り当て直し
+  document.getElementById("btn-first").onclick = goToLastPageOfChapter; // |◀ 端へ
+  document.getElementById("btn-prev").onclick = next;                   // ◀ 次（ページ/話）
+  document.getElementById("btn-next").onclick = prev;                   // 前 ▶（ページ/話）
+  document.getElementById("btn-last").onclick = goToFirstPageOfChapter;  // ▶| 端へ
 
   initSlider();
 });
