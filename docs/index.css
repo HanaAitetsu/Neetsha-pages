@@ -260,35 +260,44 @@ hr {
   width: 100% !important; /* 1枚しかない時は全幅 */
 }
 
-/* ビューワー全体の基本設定 */
+/* --- ビューワー共通設定 --- */
 #viewer.horizontal {
-  background-color: #eee;
   width: 100%;
   overflow: hidden;
   position: relative;
-  height: auto !important; /* 高さを固定しない */
+  background-color: #222; /* デフォルトは明るい色 */
+  height: auto !important;
 }
 
-/* スライド1枚分（単なら100%、見開きなら50%×2を包む） */
+/* スライド1枚分（単なら幅100%、見開きなら50%x2）を包む枠 */
 .slide-wrapper {
   flex: 0 0 100%;
   width: 100%;
   display: flex !important;
-  flex-direction: row-reverse !important;
+  flex-direction: row-reverse !important; /* 右読み */
   justify-content: center;
-  align-items: flex-start; /* 常に上端に合わせる（画像が長くても縮ませない） */
-  padding: 0;
   box-sizing: border-box;
 }
 
-/* 見開きモードの背景と余白 */
-.slide-wrapper.spread-style {
-  background-color: #222; /* 見開きは黒背景 */
-  /* 見開き時、画像が短くても少し余白が見えるように最小高さを設定 */
-  min-height: 60vh; 
+/* --- モード別スタイル --- */
+
+/* 単ページ：上に詰め、背景は周囲と同じ */
+.single-style {
+  align-items: flex-start !important; 
+  background-color: #222;
+  min-height: auto;
 }
 
-/* 単ページ画像：横幅100% */
+/* 見開き：中央に寄せ、背景は黒、最低1画面分の高さを確保 */
+.spread-style {
+  align-items: center !important; 
+  background-color: #222;
+  min-height: 100vh;
+}
+
+/* --- 画像設定 --- */
+
+/* 単ページ：横幅いっぱい、縦制限なし */
 .img-single {
   width: 100% !important;
   max-width: 100% !important;
@@ -296,11 +305,12 @@ hr {
   display: block;
 }
 
-/* 見開き画像：横幅50%を強制（縮ませない） */
+/* 見開き：横幅50%固定、縦は画面内に収まるよう配慮 */
 .img-spread {
   width: 50% !important;
   max-width: 50% !important;
   height: auto !important;
-  display: block;
+  max-height: 95vh !important;
   object-fit: contain;
+  display: block;
 }
