@@ -81,28 +81,19 @@ a:active {
 }
 /* ツールバー */
 /* 変更後 */
-/* ツールバーのボタンが並ぶように */
-#toolbar {
-  margin: 10px 0;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap; /* 画面が狭いときは折り返す */
-}
-
 #toolbar button {
-  min-width: 140px; /* ボタンの幅を揃える */
-  padding: 10px;
-  cursor: pointer;
-  background: #444;
-  color: #fff;
+  background: none;
   border: none;
-  border-radius: 5px;
+  padding: 0;
+  cursor: pointer;
 }
+#toolbar button img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+#toolbar button:hover { background: none; opacity: 0.8; }
 
-#toolbar button:hover {
-  background: #666;
-}
 /* 操作ボタン帯 */
 #viewer-controls {
   display: flex;
