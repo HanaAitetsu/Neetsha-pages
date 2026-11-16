@@ -198,10 +198,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ボタンに機能を割り当て直し
-  document.getElementById("btn-first").onclick = goToLastPageOfChapter; // |◀ 端へ
+  document.getElementById("btn-first").onclick = () => {
+  if (confirm("前の話に行っていい？")) location.href = prevEpisode;
+};
+document.getElementById("btn-last").onclick = () => {
+  if (confirm("次の話に進んじゃうぞい！")) location.href = nextEpisode;
+};
   document.getElementById("btn-prev").onclick = next;                   // ◀ 次（ページ/話）
   document.getElementById("btn-next").onclick = prev;                   // 前 ▶（ページ/話）
-  document.getElementById("btn-last").onclick = goToFirstPageOfChapter;  // ▶| 端へ
 
   initSlider();
 });
